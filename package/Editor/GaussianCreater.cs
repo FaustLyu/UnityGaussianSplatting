@@ -21,7 +21,7 @@ public class GaussianCreater : EditorWindow
 
         if (GUILayout.Button("GenerateGaussian"))
         {
-            inputFolder = EditorUtility.OpenFolderPanel("Select Folder", "", "");
+            inputFolder = EditorUtility.OpenFolderPanel("Select Folder", "Assets/GaussianAssets", "");
             GenerateGameObjects();
         }
     }
