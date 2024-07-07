@@ -19,12 +19,14 @@ namespace GaussianSplatting.Runtime
         [SerializeField] int m_SplatCount;
         [SerializeField] Vector3 m_BoundsMin;
         [SerializeField] Vector3 m_BoundsMax;
+        [SerializeField] Vector3 o_posCenter;
         [SerializeField] Hash128 m_DataHash;
 
         public int formatVersion => m_FormatVersion;
         public int splatCount => m_SplatCount;
         public Vector3 boundsMin => m_BoundsMin;
         public Vector3 boundsMax => m_BoundsMax;
+        public Vector3 posCenter => o_posCenter;
         public Hash128 dataHash => m_DataHash;
 
         // Match VECTOR_FMT_* in HLSL
@@ -100,7 +102,7 @@ namespace GaussianSplatting.Runtime
             public ushort shPadding; // pad to multiple of 4 bytes
         }
 
-        public void Initialize(int splats, VectorFormat formatPos, VectorFormat formatScale, ColorFormat formatColor, SHFormat formatSh, Vector3 bMin, Vector3 bMax, CameraInfo[] cameraInfos)
+        public void Initialize(int splats, VectorFormat formatPos, VectorFormat formatScale, ColorFormat formatColor, SHFormat formatSh, Vector3 bMin, Vector3 bMax, Vector3 posCenter, CameraInfo[] cameraInfos)
         {
             m_SplatCount = splats;
             m_FormatVersion = kCurrentVersion;
@@ -111,6 +113,7 @@ namespace GaussianSplatting.Runtime
             m_Cameras = cameraInfos;
             m_BoundsMin = bMin;
             m_BoundsMax = bMax;
+            o_posCenter = posCenter;
         }
 
         public void SetDataHash(Hash128 hash)

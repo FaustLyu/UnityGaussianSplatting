@@ -64,6 +64,7 @@ namespace GaussianSplatting.Editor
 
             EditorGUILayout.Vector3Field("Bounds Min", gs.boundsMin);
             EditorGUILayout.Vector3Field("Bounds Max", gs.boundsMax);
+            EditorGUILayout.Vector3Field("Position Center", gs.posCenter);
 
             EditorGUILayout.TextField("Data Hash", gs.dataHash.ToString());
         }

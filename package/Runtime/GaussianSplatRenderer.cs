@@ -214,6 +214,9 @@ namespace GaussianSplatting.Runtime
         }
         public GaussianSplatAsset m_Asset;
 
+        // object center
+        public Vector3 o_Center;
+
         [Range(0.1f, 2.0f)] [Tooltip("Additional scaling factor for the splats")]
         public float m_SplatScale = 1.0f;
         [Range(0.05f, 20.0f)]
@@ -362,7 +365,8 @@ namespace GaussianSplatting.Runtime
         {
             if (!HasValidAsset)
                 return;
-
+            // [simplest] get the object center
+            
             m_SplatCount = asset.splatCount;
             m_GpuPosData = new GraphicsBuffer(GraphicsBuffer.Target.Raw | GraphicsBuffer.Target.CopySource, (int) (asset.posData.dataSize / 4), 4) { name = "GaussianPosData" };
             m_GpuPosData.SetData(asset.posData.GetData<uint>());

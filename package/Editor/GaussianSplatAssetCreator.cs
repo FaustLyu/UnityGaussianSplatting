@@ -270,11 +270,12 @@ namespace GaussianSplatting.Editor
                 return;
             }
 
-            float3 boundsMin, boundsMax;
+            float3 boundsMin, boundsMax, posCenter;
             var boundsJob = new CalcBoundsJob
             {
                 m_BoundsMin = &boundsMin,
                 m_BoundsMax = &boundsMax,
+                o_posCenter = &posCenter,
                 m_SplatData = inputSplats
             };
             boundsJob.Schedule().Complete();
@@ -295,7 +296,7 @@ namespace GaussianSplatting.Editor
 
             EditorUtility.DisplayProgressBar(kProgressTitle, "Creating data objects", 0.7f);
             GaussianSplatAsset asset = ScriptableObject.CreateInstance<GaussianSplatAsset>();
-            asset.Initialize(inputSplats.Length, m_FormatPos, m_FormatScale, m_FormatColor, m_FormatSH, boundsMin, boundsMax, cameras);
+            asset.Initialize(inputSplats.Length, m_FormatPos, m_FormatScale, m_FormatColor, m_FormatSH, boundsMin, boundsMax, posCenter, cameras);
             asset.name = baseName;
 
             var dataHash = new Hash128((uint)asset.splatCount, (uint)asset.formatVersion, 0, 0);
@@ -406,21 +407,28 @@ namespace GaussianSplatting.Editor
         {
             [NativeDisableUnsafePtrRestriction] public unsafe float3* m_BoundsMin;
             [NativeDisableUnsafePtrRestriction] public unsafe float3* m_BoundsMax;
+            // [simplest] cal the center pos
+            [NativeDisableUnsafePtrRestriction] public unsafe float3* o_posCenter;
             [ReadOnly] public NativeArray<InputSplatData> m_SplatData;
 
             public unsafe void Execute()
             {
                 float3 boundsMin = float.PositiveInfinity;
                 float3 boundsMax = float.NegativeInfinity;
+                double3 meanPos= 0f;
 
                 for (int i = 0; i < m_SplatData.Length; ++i)
                 {
                     float3 pos = m_SplatData[i].pos;
                     boundsMin = math.min(boundsMin, pos);
                     boundsMax = math.max(boundsMax, pos);
+                    meanPos += pos;
                 }
                 *m_BoundsMin = boundsMin;
                 *m_BoundsMax = boundsMax;
+                // double lenDouble = m_SplatData.Length;
+                meanPos /= (double)m_SplatData.Length;
+                *o_posCenter = new float3((float)meanPos.x, (float)meanPos.y, (float)meanPos.z);
             }
         }
 
