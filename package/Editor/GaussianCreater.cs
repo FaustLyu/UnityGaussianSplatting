@@ -84,8 +84,8 @@ public class GaussianCreater : EditorWindow
         renderer.OnEnable();
         // Transform transform = newObject.transform;
         SphereCollider collider = newObject.AddComponent<SphereCollider>();
-        collider.radius = 1.0f;
-        // collider.center = loadedAsset.posCenter;
+        collider.radius = (loadedAsset.boundsMax - loadedAsset.boundsMin).magnitude / 2 * 0.65f;
+        collider.center = loadedAsset.posCenter;
     }
 
 }
