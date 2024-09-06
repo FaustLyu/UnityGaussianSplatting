@@ -3,6 +3,8 @@ using UnityEditor;
 using System.IO;
 using GaussianSplatting.Runtime;
 using UnityEditor.VersionControl;
+using UnityEngine.UIElements;
+using NUnit.Framework.Constraints;
 
 public class GaussianCreater : EditorWindow
 {
@@ -83,9 +85,36 @@ public class GaussianCreater : EditorWindow
         renderer.m_Asset = loadedAsset;
         renderer.OnEnable();
         // Transform transform = newObject.transform;
-        SphereCollider collider = newObject.AddComponent<SphereCollider>();
-        collider.radius = (loadedAsset.boundsMax - loadedAsset.boundsMin).magnitude / 2 * 0.65f;
-        collider.center = loadedAsset.posCenter;
+        float boundRadius = (loadedAsset.boundsMax - loadedAsset.boundsMin).magnitude / 2 * 0.65f;
+        float scale = 0;
+        if (objectName.ToLower().Contains("apple")) {
+            SphereCollider collider = newObject.AddComponent<SphereCollider>();
+            float desRadius = 0.1334f / 2;
+            scale = desRadius / boundRadius;
+            collider.radius = boundRadius;
+            collider.center = loadedAsset.posCenter;
+        }
+        
+        // [Modify] obj.transform center
+        Transform transform = newObject.transform;
+        // --------位置修正---------
+        //创建目标的父物体
+        transform.localScale = new Vector3(transform.localScale.x, -transform.localScale.y, transform.localScale.z);
+        Transform targetParent = new GameObject(newObject.name + "-Parent").transform;
+        //如果目标原来已有父物体,则将创建目标父物体的父物体设为原父物体;
+        Transform originalParent = newObject.transform.parent;
+        if (originalParent != null)
+        {
+            targetParent.SetParent(originalParent);
+        }
+         //设置目标父物体的位置为合并后的网格渲染边界中心
+        targetParent.position = loadedAsset.posCenter;
+        // Scaling the object
+        if (scale != 0) {
+            targetParent.transform.localScale = new Vector3(scale, scale, scale);
+        }
+        //设置目标物体的父物体
+        newObject.transform.parent = targetParent;
     }
 
 }
